@@ -7,7 +7,7 @@ void main() {
 }
 
 class RegisterScreen extends StatefulWidget {
-   const RegisterScreen({Key? key}) : super(key: key);
+   const RegisterScreen({super.key});
 @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -22,10 +22,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
+    }
   }
 
 
