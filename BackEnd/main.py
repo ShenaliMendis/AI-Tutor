@@ -64,6 +64,8 @@ class QuizQuestion(BaseModel):
 
 class LessonResponse(BaseModel):
     lesson_content: str
+
+class QuizResponse(BaseModel):
     quiz: List[QuizQuestion]
 
 # Helper function to generate unique IDs
@@ -211,25 +213,51 @@ async def plan_module(request: ModuleRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating module: {str(e)}")
 
-@app.post("/api/create-lesson", response_model=LessonResponse)
-async def create_lesson(request: LessonRequest):
-    # Prepare the prompt for lesson creation
+@app.post("/api/create-lesson-content", response_model=LessonResponse)
+async def create_lesson_content(request: LessonRequest):
+    # Prepare the prompt for lesson content creation
     prompt = f"""
-    Create a detailed lesson and quiz based on the following information:
+    Create a detailed lesson based on the following information:
     
     LESSON TITLE: {request.lesson_title}
     LESSON OBJECTIVE: {request.lesson_objective}
     
-    Generate:
-    1. Comprehensive lesson content (800-1200 words) that thoroughly covers the topic
-    2. A quiz with 3-5 questions to test understanding
-    
+    Generate comprehensive lesson content (800-1200 words) that thoroughly covers the topic. 
     The lesson content should include:
     - Clear explanations of concepts
     - Examples when appropriate
     - Practical applications when possible
     - Key takeaways or summary points
+    """
     
+    try:
+        response = model.generate_content(prompt)
+        lesson_content = response.text.strip()
+        
+        # Validate response content
+        if not lesson_content:
+            raise HTTPException(status_code=500, detail="No response received from the model.")
+        
+        # Create a LessonResponse object
+        lesson_response = LessonResponse(
+            lesson_content=lesson_content
+        )
+
+        return lesson_response
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating lesson content: {str(e)}")
+
+@app.post("/api/create-quiz", response_model=QuizResponse)
+async def create_quiz(request: LessonRequest):
+    # Prepare the prompt for quiz creation
+    prompt = f"""
+    Create a quiz based on the following lesson information:
+    
+    LESSON TITLE: {request.lesson_title}
+    LESSON OBJECTIVE: {request.lesson_objective}
+    
+    Generate a quiz with 3-5 questions to test understanding. 
     For each quiz question provide:
     - A clear question
     - 4 possible answer options (A, B, C, D)
@@ -238,7 +266,6 @@ async def create_lesson(request: LessonRequest):
     
     Format the response as a JSON object with the following structure:
     {{
-      "lesson_content": "...",
       "quiz": [
         {{
           "question": "...",
@@ -252,21 +279,28 @@ async def create_lesson(request: LessonRequest):
     
     try:
         response = model.generate_content(prompt)
-        lesson_data = response.text
+        quiz_data = response.text.strip()
+        
+        # Validate response content
+        if not quiz_data:
+            raise HTTPException(status_code=500, detail="No response received from the model.")
         
         # Remove markdown code block syntax if present
-        if lesson_data.startswith("```json"):
-            lesson_data = lesson_data.replace("```json", "", 1)
-        if lesson_data.endswith("```"):
-            lesson_data = lesson_data.replace("```", "", 1)
-            
-        import json
-        lesson_json = json.loads(lesson_data.strip())
+        if quiz_data.startswith("```json"):
+            quiz_data = quiz_data.replace("```json", "", 1)
+        if quiz_data.endswith("```"):
+            quiz_data = quiz_data.replace("```", "", 1)
         
-        return lesson_json
+        import json
+        try:
+            quiz_json = json.loads(quiz_data)
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=500, detail=f"Invalid JSON response: {str(e)}")
+        
+        return {"quiz": quiz_json.get("quiz", [])}
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating lesson: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
 
 # Run the FastAPI app with uvicorn
 if __name__ == "__main__":

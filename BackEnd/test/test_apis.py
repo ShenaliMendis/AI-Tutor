@@ -39,18 +39,34 @@ def test_plan_module():
         json.dump(response.json(), f, indent=4)
     print("Module plan saved to module_plan.json")
 
-def test_create_lesson():
-    print("Testing /api/create-lesson...")
+def test_create_lesson_content():
+    print("Testing /api/create-lesson-content...")
     payload = {
-        "lesson_title": "Introduction to Variables",
-        "lesson_objective": "Understand what variables are and how to use them in Python."
+        "lesson_title": "Data Types in Python",
+        "lesson_objective": "Understand different data types in Python and their usage."
     }
-    response = requests.post(f"{BASE_URL}/api/create-lesson", json=payload)
+    response = requests.post(f"{BASE_URL}/api/create-lesson-content", json=payload)
+    print("Response:", response.status_code)
+    print("Lesson Content (Markdown):\n")
+    print(response.text)
+    
+    try:
+        response_data = response.json()
+        with open("lesson_content.md", "w") as f:
+            f.write(response_data.get("lesson_content", ""))
+    except json.JSONDecodeError:
+        print("Failed to decode JSON response.")
+
+def test_create_quiz():
+    print("Testing /api/create-quiz...")
+    payload = {
+        "lesson_title": "Data Types in Python",
+        "lesson_objective": "Understand different data types in Python and their usage."
+    }
+    response = requests.post(f"{BASE_URL}/api/create-quiz", json=payload)
     print("Response:", response.status_code, response.json())
-    # save response to a file
-    with open("lesson_plan.json", "w") as f:
+    with open("quiz.json", "w") as f:
         json.dump(response.json(), f, indent=4)
-    print("Lesson plan saved to lesson_plan.json")
 
 if __name__ == "__main__":
     print("Starting API tests...")
@@ -60,5 +76,8 @@ if __name__ == "__main__":
     test_plan_module()
     time.sleep(30)
 
-    test_create_lesson()
+    test_create_lesson_content()
+    time.sleep(30)
+
+    test_create_quiz()
     print("API tests completed.")
