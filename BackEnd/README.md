@@ -63,7 +63,15 @@ The system provides the following API endpoints:
 
 - `POST /api/plan-course`: Generate a course outline with modules
 - `POST /api/plan-module`: Generate module details with lessons
-- `POST /api/create-lesson`: Generate lesson content with quiz
+- `POST /api/create-lesson-content`: Generate lesson content for a given lesson
+- `POST /api/create-quiz`: Generate a quiz for a given lesson
+
+## For Testing
+
+To run the tests, execute the `test/test_apis.py` file. This will send requests to the API endpoints and print the responses.
+   ```
+   python test/test_apis.py
+   ```
 
 ## System Architecture
 
@@ -84,9 +92,11 @@ course-generation-system/
 ├── run.py                # Script to run both services
 ├── requirements.txt      # Python dependencies
 ├── README.md             # Project documentation
-└── templates/            # HTML templates
-    ├── index.html        # Course generation form
-    └── course.html       # Course viewer page
+├── templates/            # HTML templates
+│   ├── index.html        # Course generation form
+│   └── course.html       # Course viewer page
+├── test/                 # Test scripts
+│   └── test_apis.py      # API tests
 ```
 
 ## How to Use the System
