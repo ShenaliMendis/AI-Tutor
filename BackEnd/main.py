@@ -71,7 +71,7 @@ def generate_id(prefix=""):
     return f"{prefix}_{uuid.uuid4().hex[:8]}"
 
 # Initialize the model
-model = GenerativeModel("gemini-1.5-pro")
+model = GenerativeModel("gemini-2.0-flash-exp")
 
 @app.post("/api/plan-course", response_model=CourseResponse)
 async def plan_course(request: CourseRequest):
