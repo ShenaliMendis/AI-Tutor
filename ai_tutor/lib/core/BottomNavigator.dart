@@ -4,7 +4,7 @@ class BottomNavigator extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  BottomNavigator({
+  const BottomNavigator({super.key, 
     required this.currentIndex,
     required this.onTap,
   });
