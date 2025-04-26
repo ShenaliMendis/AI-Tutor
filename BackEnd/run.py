@@ -6,6 +6,7 @@ import os
 import time
 import threading
 import signal
+import db_handler as db
 
 def run_fastapi():
     print("Starting FastAPI backend...")
@@ -27,6 +28,10 @@ def main():
         print("Error: .env file not found.")
         print("Please create a .env file with GOOGLE_API_KEY and FLASK_SECRET_KEY.")
         sys.exit(1)
+    
+    # Initialize database
+    print("Initializing database...")
+    db.init_db()
     
     try:
         # Start FastAPI in a separate thread

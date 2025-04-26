@@ -1,102 +1,153 @@
-<!-- File: templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Generator</title>
+    <title>AI Tutor - Course Generation System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .card {
-            margin-bottom: 20px;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Course Generation System</h1>
-        
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Course Details</h5>
+     <!-- Navigation -->
+     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">AI Tutor</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/plan-course">Create Course</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view-course">View Course</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/export-course">Export</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clear-session">Reset</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
                     </div>
-                    <div class="card-body">
-                        <form id="courseForm">
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Course Title or Description</label>
-                                <input type="text" class="form-control" id="title" name="title" required 
-                                       placeholder="E.g., Introduction to Digital Marketing">
-                            </div>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Course Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" required
-                                         placeholder="A beginner-friendly course for people with no prior experience..."></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="target_audience" class="form-label">Target Audience</label>
-                                <input type="text" class="form-control" id="target_audience" name="target_audience" required
-                                       placeholder="E.g., Beginners, small business owners">
-                            </div>
-                            <div class="mb-3">
-                                <label for="time_available" class="form-label">Time Available</label>
-                                <input type="text" class="form-control" id="time_available" name="time_available" required
-                                       placeholder="E.g., 4 weeks, 2 hours per week">
-                            </div>
-                            <div class="mb-3">
-                                <label for="learning_objectives" class="form-label">Learning Objectives (Optional, one per line)</label>
-                                <textarea class="form-control" id="learning_objectives" name="learning_objectives" rows="4"
-                                         placeholder="Understand the basics of digital marketing&#10;Learn key platforms (Google Ads, Facebook)&#10;Create a simple marketing campaign"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="preferred_format" class="form-label">Preferred Format</label>
-                                <select class="form-select" id="preferred_format" name="preferred_format">
-                                    <option value="text-heavy">Text-heavy</option>
-                                    <option value="video-first">Video-first</option>
-                                    <option value="interactive">Interactive</option>
-                                    <option value="balanced">Balanced mix</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Generate Course</button>
-                        </form>
-                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Hero Section -->
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold text-body-emphasis">AI Tutor</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4">
+                Use AI to automatically generate educational content, complete courses,
+                and quizzes for any subject or learning objective.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="/plan-course" class="btn btn-primary btn-lg px-4 gap-3">Create a Course</a>
+                <a href="#features" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div id="features" class="container px-4 py-5">
+        <h2 class="pb-2 border-bottom">Features</h2>
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-mortarboard" viewBox="0 0 16 16">
+                        <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917l-7.5-3.5ZM8 8.46 1.758 5.965 8 3.052l6.242 2.913L8 8.46Z"/>
+                        <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Zm-.068 1.873.22-.748 3.496 1.311a.5.5 0 0 0 .352 0l3.496-1.311.22.748L8 12.46l-3.892-1.556Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">Complete Course Generation</h3>
+                    <p>Generate entire courses with modules, lessons, and quizzes based on your specific requirements.</p>
                 </div>
             </div>
-            
-            <div class="col-lg-6">
-                <div id="loading" class="loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Generating your course...</p>
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-layout-text-window" viewBox="0 0 16 16">
+                        <path d="M3 6.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm.5 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+                        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v1H1V2a1 1 0 0 1 1-1h12zm1 3v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4h14z"/>
+                    </svg>
                 </div>
-                
-                <div id="courseResult" style="display: none;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 id="courseTitleHeader">Course Title</h5>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">Detailed Content</h3>
+                    <p>Get comprehensive, well-structured educational content that's ready to use for teaching or learning.</p>
+                </div>
+            </div>
+            <div class="col d-flex align-items-start">
+                <div class="icon-square text-body-emphasis bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clipboard-check" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="fs-2 text-body-emphasis">Interactive Quizzes</h3>
+                    <p>Generate quizzes with multiple-choice questions, answers and explanations to test knowledge.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="container px-4 py-5">
+        <h2 class="pb-2 border-bottom">How It Works</h2>
+        <div class="row g-4 py-5">
+            <div class="col-md-12">
+                <div class="steps">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Define Your Course</h4>
+                            <p>Provide a title, description, target audience, and learning objectives for your course.</p>
                         </div>
-                        <div class="card-body">
-                            <p id="courseDescription"></p>
-                            <h6>Introduction:</h6>
-                            <p id="courseIntroduction"></p>
-                            
-                            <h6 class="mt-4">Modules:</h6>
-                            <div id="modulesList"></div>
-                            
-                            <div class="mt-3">
-                                <a href="/course" class="btn btn-success">View Full Course</a>
-                            </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Generate Course Outline</h4>
+                            <p>AI creates a structured course outline with modules based on your specifications.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Create Module Details</h4>
+                            <p>Generate detailed module plans with specific lessons and learning objectives.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Generate Lesson Content</h4>
+                            <p>Create comprehensive lesson content and quizzes for each lesson in your modules.</p>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Export Your Course</h4>
+                            <p>Export the complete course in JSON format for use in other systems.</p>
                         </div>
                     </div>
                 </div>
@@ -104,105 +155,22 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>AI Tutor</h5>
+                    <p>An AI-powered course generation system</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Powered by Google Gemini | &copy; 2024</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            // Show loading
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('courseResult').style.display = 'none';
-            
-            // Send request
-            fetch('/generate-course', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const course = data.course;
-                    
-                    // Update UI
-                    document.getElementById('courseTitleHeader').textContent = course.course_title;
-                    document.getElementById('courseDescription').textContent = course.course_description;
-                    document.getElementById('courseIntroduction').textContent = course.course_introduction;
-                    
-                    // Display modules
-                    const modulesList = document.getElementById('modulesList');
-                    modulesList.innerHTML = '';
-                    
-                    course.modules.forEach((module, index) => {
-                        const moduleElement = document.createElement('div');
-                        moduleElement.className = 'card mb-2';
-                        moduleElement.innerHTML = `
-                            <div class="card-body">
-                                <h6>${index + 1}. ${module.module_title}</h6>
-                                <p>${module.module_summary}</p>
-                                <button class="btn btn-sm btn-outline-primary generate-module-btn" 
-                                        data-module-id="${module.module_id}">
-                                    Generate Module Details
-                                </button>
-                            </div>
-                        `;
-                        modulesList.appendChild(moduleElement);
-                    });
-                    
-                    // Add event listeners to module buttons
-                    document.querySelectorAll('.generate-module-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const moduleId = this.getAttribute('data-module-id');
-                            generateModule(moduleId, this);
-                        });
-                    });
-                    
-                    // Show results
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('courseResult').style.display = 'block';
-                } else {
-                    alert('Error: ' + data.error);
-                    document.getElementById('loading').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error);
-                document.getElementById('loading').style.display = 'none';
-            });
-        });
-        
-        function generateModule(moduleId, button) {
-            // Disable button and show loading
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
-            
-            const formData = new FormData();
-            formData.append('module_id', moduleId);
-            
-            // Send request
-            fetch('/generate-module', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.innerHTML = 'Generated ✓';
-                    button.classList.remove('btn-outline-primary');
-                    button.classList.add('btn-success');
-                } else {
-                    alert('Error: ' + data.error);
-                    button.innerHTML = 'Generate Module Details';
-                    button.disabled = false;
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error);
-                button.innerHTML = 'Generate Module Details';
-                button.disabled = false;
-            });
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
