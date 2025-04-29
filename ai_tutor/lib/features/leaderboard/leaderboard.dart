@@ -102,7 +102,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   label: Text('Search'),
                   icon: Icon(Icons.arrow_forward),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF002E48),
+                    backgroundColor: Color.fromARGB(255, 185, 185, 185),
                   ),
                 ),
               ],
@@ -178,7 +178,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       padding: EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFF004E7C),
+                        color: Color.fromARGB(255, 128, 129, 129),
                       ),
                       child: Text(
                         '${item['rank']}${getRankSuffix(item['rank'])}',
@@ -242,7 +242,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 },
                 label: Text('Back Home'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF002E48),
+                  backgroundColor: Color.fromARGB(255, 137, 138, 138),
                 ),
               ),
             ),
