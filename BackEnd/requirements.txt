@@ -5,3 +5,9 @@ flask
 requests
 python-dotenv
 google-generativeai
+redis
+tenacity
+markdown
+asyncio
+python-multipart
+httpx

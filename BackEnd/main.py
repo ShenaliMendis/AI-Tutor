@@ -1,308 +1,119 @@
 # File: main.py
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import os
-import uuid
-from google.generativeai import GenerativeModel
-import google.generativeai as genai
 from dotenv import load_dotenv
+import uvicorn
 
 # Load environment variables
 load_dotenv()
 
-# Configure Google Generative AI
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+app = FastAPI(
+    title="Advanced Course Generation API",
+    description="Enterprise-grade API for generating adaptive learning content using Google Generative AI",
+    version="1.1.0",
+)
 
-app = FastAPI(title="Course Generation API", description="API for generating courses using Google Generative AI")
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
-# Data models
-class LearningObjective(BaseModel):
-    objective: str
+# Import API router with error handling
+try:
+    from api import router as api_router
+    # Include API routes
+    app.include_router(api_router)
+except ImportError as e:
+    print(f"Error importing API router: {e}")
+    print("This might be due to an incompatibility with aioredis and Python 3.11.")
+    print("Please run 'pip uninstall aioredis' and 'pip install redis' to fix.")
 
-class CourseRequest(BaseModel):
-    title: str
-    description: str
-    target_audience: str
-    time_available: str
-    learning_objectives: Optional[List[str]] = None
-    preferred_format: Optional[str] = "text-heavy"
+# Root endpoint
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to the AI Tutor API",
+        "documentation": "/docs",
+        "version": "1.0.0"
+    }
 
-class ModuleInfo(BaseModel):
-    module_id: str
-    module_title: str
-    module_summary: str
-
-class CourseResponse(BaseModel):
-    course_title: str
-    course_description: str
-    course_introduction: str
-    modules: List[ModuleInfo]
-
-class ModuleRequest(BaseModel):
-    module_title: str
-    module_summary: str
-
-class LessonInfo(BaseModel):
-    lesson_id: str
-    lesson_title: str
-    lesson_objective: str
-
-class ModuleResponse(BaseModel):
-    module_introduction: str
-    lessons: List[LessonInfo]
-
-class LessonRequest(BaseModel):
-    lesson_title: str
-    lesson_objective: str
-
-class QuizQuestion(BaseModel):
-    question: str
-    options: List[str]
-    correct_answer: str
-    explanation: str
-
-class LessonResponse(BaseModel):
-    lesson_content: str
-
-class QuizResponse(BaseModel):
-    quiz: List[QuizQuestion]
-
-# Helper function to generate unique IDs
-def generate_id(prefix=""):
-    return f"{prefix}_{uuid.uuid4().hex[:8]}"
-
-# Initialize the model
-model = GenerativeModel("gemini-2.0-flash-exp")
-
-@app.post("/api/plan-course", response_model=CourseResponse)
-async def plan_course(request: CourseRequest):
-    # Prepare the prompt for course planning
-    objectives_text = "\n".join([f"- {obj}" for obj in request.learning_objectives]) if request.learning_objectives else "No specific objectives provided."
-    
-    prompt = f"""
-    Create a comprehensive course plan based on the following information:
-    
-    TITLE: {request.title}
-    DESCRIPTION: {request.description}
-    TARGET AUDIENCE: {request.target_audience}
-    TIME AVAILABLE: {request.time_available}
-    PREFERRED FORMAT: {request.preferred_format}
-    
-    LEARNING OBJECTIVES:
-    {objectives_text}
-    
-    Generate a structured course with the following:
-    1. A refined course title
-    2. An engaging course description (3-5 sentences)
-    3. A compelling course introduction (1-2 paragraphs)
-    4. 3-6 logical modules that cover the subject matter comprehensively
-    
-    For each module provide:
-    - A clear title
-    - A brief summary (2-3 sentences)
-    
-    Format the response as a JSON object with the following structure:
-    {{
-      "course_title": "...",
-      "course_description": "...",
-      "course_introduction": "...",
-      "modules": [
-        {{
-          "module_title": "...",
-          "module_summary": "..."
-        }}
-      ]
-    }}
-    """
-    
+# # Legacy API endpoints (for backward compatibility)
+@app.post("/api/plan-course")
+async def legacy_plan_course(request: Request):
+    """Legacy endpoint that redirects to v1 API"""
+    from api.v1.routes import CourseRequest  # Add import
+    data = await request.json()
     try:
-        response = model.generate_content(prompt)
-        course_data = response.text
-        
-        # Remove markdown code block syntax if present
-        if course_data.startswith("```json"):
-            course_data = course_data.replace("```json", "", 1)
-        if course_data.endswith("```"):
-            course_data = course_data.replace("```", "", 1)
-            
-        import json
-        course_json = json.loads(course_data.strip())
-        
-        # Add module_id to each module
-        modules_with_ids = []
-        for i, module in enumerate(course_json["modules"]):
-            module_with_id = {
-                "module_id": generate_id("mod"),
-                "module_title": module["module_title"],
-                "module_summary": module["module_summary"]
-            }
-            modules_with_ids.append(module_with_id)
-        
-        course_response = {
-            "course_title": course_json["course_title"],
-            "course_description": course_json["course_description"],
-            "course_introduction": course_json["course_introduction"],
-            "modules": modules_with_ids
-        }
-        
-        return course_response
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating course: {str(e)}")
-
-@app.post("/api/plan-module", response_model=ModuleResponse)
-async def plan_module(request: ModuleRequest):
-    # Prepare the prompt for module planning
-    prompt = f"""
-    Create a detailed module plan based on the following information:
-    
-    MODULE TITLE: {request.module_title}
-    MODULE SUMMARY: {request.module_summary}
-    
-    Generate:
-    1. A compelling module introduction (1 paragraph)
-    2. 3-5 logical lessons that cover the module content comprehensively
-    
-    For each lesson provide:
-    - A clear title
-    - A specific learning objective
-    
-    Format the response as a JSON object with the following structure:
-    {{
-      "module_introduction": "...",
-      "lessons": [
-        {{
-          "lesson_title": "...",
-          "lesson_objective": "..."
-        }}
-      ]
-    }}
-    """
-    
-    try:
-        response = model.generate_content(prompt)
-        module_data = response.text
-        
-        # Remove markdown code block syntax if present
-        if module_data.startswith("```json"):
-            module_data = module_data.replace("```json", "", 1)
-        if module_data.endswith("```"):
-            module_data = module_data.replace("```", "", 1)
-            
-        import json
-        module_json = json.loads(module_data.strip())
-        
-        # Add lesson_id to each lesson
-        lessons_with_ids = []
-        for i, lesson in enumerate(module_json["lessons"]):
-            lesson_with_id = {
-                "lesson_id": generate_id("les"),
-                "lesson_title": lesson["lesson_title"],
-                "lesson_objective": lesson["lesson_objective"]
-            }
-            lessons_with_ids.append(lesson_with_id)
-        
-        module_response = {
-            "module_introduction": module_json["module_introduction"],
-            "lessons": lessons_with_ids
-        }
-        
-        return module_response
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating module: {str(e)}")
-
-@app.post("/api/create-lesson-content", response_model=LessonResponse)
-async def create_lesson_content(request: LessonRequest):
-    # Prepare the prompt for lesson content creation
-    prompt = f"""
-    Create a detailed lesson based on the following information:
-    
-    LESSON TITLE: {request.lesson_title}
-    LESSON OBJECTIVE: {request.lesson_objective}
-    
-    Generate comprehensive lesson content (800-1200 words) that thoroughly covers the topic. 
-    The lesson content should include:
-    - Clear explanations of concepts
-    - Examples when appropriate
-    - Practical applications when possible
-    - Key takeaways or summary points
-    """
-    
-    try:
-        response = model.generate_content(prompt)
-        lesson_content = response.text.strip()
-        
-        # Validate response content
-        if not lesson_content:
-            raise HTTPException(status_code=500, detail="No response received from the model.")
-        
-        # Create a LessonResponse object
-        lesson_response = LessonResponse(
-            lesson_content=lesson_content
+        course_request = CourseRequest(**data)  # Create Pydantic model
+        from api.v1.routes import plan_course
+        return await plan_course(course_request)  # Pass the model instance
+    except ImportError:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "API module import error. Please check server logs."}
         )
 
-        return lesson_response
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating lesson content: {str(e)}")
-
-@app.post("/api/create-quiz", response_model=QuizResponse)
-async def create_quiz(request: LessonRequest):
-    # Prepare the prompt for quiz creation
-    prompt = f"""
-    Create a quiz based on the following lesson information:
-    
-    LESSON TITLE: {request.lesson_title}
-    LESSON OBJECTIVE: {request.lesson_objective}
-    
-    Generate a quiz with 3-5 questions to test understanding. 
-    For each quiz question provide:
-    - A clear question
-    - 4 possible answer options (A, B, C, D)
-    - The correct answer
-    - A brief explanation of why the answer is correct
-    
-    Format the response as a JSON object with the following structure:
-    {{
-      "quiz": [
-        {{
-          "question": "...",
-          "options": ["A. option", "B. option", "C. option", "D. option"],
-          "correct_answer": "B. option",
-          "explanation": "..."
-        }}
-      ]
-    }}
-    """
-    
+# Similarly update other legacy endpoints
+@app.post("/api/plan-module")
+async def legacy_plan_module(request: Request):
+    """Legacy endpoint that redirects to v1 API"""
+    from api.v1.routes import ModuleRequest  # Add import
+    data = await request.json()
     try:
-        response = model.generate_content(prompt)
-        quiz_data = response.text.strip()
-        
-        # Validate response content
-        if not quiz_data:
-            raise HTTPException(status_code=500, detail="No response received from the model.")
-        
-        # Remove markdown code block syntax if present
-        if quiz_data.startswith("```json"):
-            quiz_data = quiz_data.replace("```json", "", 1)
-        if quiz_data.endswith("```"):
-            quiz_data = quiz_data.replace("```", "", 1)
-        
-        import json
-        try:
-            quiz_json = json.loads(quiz_data)
-        except json.JSONDecodeError as e:
-            raise HTTPException(status_code=500, detail=f"Invalid JSON response: {str(e)}")
-        
-        return {"quiz": quiz_json.get("quiz", [])}
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating quiz: {str(e)}")
+        module_request = ModuleRequest(**data)  # Create model instance
+        from api.v1.routes import plan_module
+        return await plan_module(module_request)
+    except ImportError:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "API module import error. Please check server logs."}
+        )
 
-# Run the FastAPI app with uvicorn
+@app.post("/api/create-lesson-content")
+async def legacy_create_lesson_content(request: Request):
+    """Legacy endpoint that redirects to v1 API"""
+    from api.v1.routes import LessonRequest  # Add import
+    data = await request.json()
+    try:
+        lesson_request = LessonRequest(**data)  # Create model instance
+        from api.v1.routes import create_lesson_content
+        return await create_lesson_content(lesson_request)
+    except ImportError:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "API module import error. Please check server logs."}
+        )
+
+@app.post("/api/create-quiz")
+async def legacy_create_quiz(request: Request):
+    """Legacy endpoint that redirects to v1 API"""
+    from api.v1.routes import LessonRequest  # Add import
+    data = await request.json()
+    try:
+        quiz_request = LessonRequest(**data)  # Create model instance
+        from api.v1.routes import create_quiz
+        return await create_quiz(quiz_request)
+    except ImportError:
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "API module import error. Please check server logs."}
+        )
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"An error occurred: {str(exc)}"}
+    )
+
+# Run the application if executed directly
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("API_PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
