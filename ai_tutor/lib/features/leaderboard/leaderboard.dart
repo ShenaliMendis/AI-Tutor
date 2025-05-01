@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Hexa Elite Leaderboard',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.yellow,
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Roboto',
       ),
