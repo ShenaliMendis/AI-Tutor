@@ -4,7 +4,6 @@ from typing import List
 class LessonRequest(BaseModel):
     course_title: str
     module_title: str
-    module_description: str
     lesson_title: str
     lesson_objective: str
 

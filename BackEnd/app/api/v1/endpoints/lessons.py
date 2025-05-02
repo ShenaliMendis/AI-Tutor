@@ -13,7 +13,6 @@ async def create_lesson_content(request: LessonRequest):
     
     COURSE TITLE: {request.course_title}
     MODULE TITLE: {request.module_title}
-    MODULE DESCRIPTION: {request.module_description}
     LESSON TITLE: {request.lesson_title}
     LESSON OBJECTIVE: {request.lesson_objective}
     
@@ -53,7 +52,6 @@ async def create_quiz(request: LessonRequest):
     
     COURSE TITLE: {request.course_title}
     MODULE TITLE: {request.module_title}
-    MODULE DESCRIPTION: {request.module_description}
     LESSON TITLE: {request.lesson_title}
     LESSON OBJECTIVE: {request.lesson_objective}
     

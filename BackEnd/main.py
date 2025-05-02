@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config import get_settings
 from app.api.v1.router import router as v1_router
 # Future imports for v2 would go here
@@ -29,9 +30,12 @@ def create_app() -> FastAPI:
     # For future versions:
     # app.include_router(v2_router)
     
-    @app.get("/")
-    async def root():
-        return {"message": "Welcome to TuteAI API. Go to /docs for documentation."}
+    # @app.get("/")
+    # async def root():
+    #     return {"message": "Welcome to TuteAI API. Go to /docs for documentation."}
+    
+    # Mount static files
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
     
     return app
 
