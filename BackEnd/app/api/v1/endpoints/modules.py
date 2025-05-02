@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.module import ModuleRequest, ModuleResponse, LessonInfo
 from app.services.ai_service import AIService
 from app.utils.id_generator import generate_id
@@ -12,16 +12,19 @@ async def plan_module(request: ModuleRequest):
     prompt = f"""
     Create a detailed module plan based on the following information:
     
+    COURSE TITLE: {request.course_title}
+    COURSE DESCRIPTION: {request.course_description}
+    
     MODULE TITLE: {request.module_title}
     MODULE SUMMARY: {request.module_summary}
     
     Generate:
-    1. A compelling module introduction (1 paragraph)
-    2. 3-5 logical lessons that cover the module content comprehensively
+    1. A compelling module introduction (1 paragraph) that connects to the overall course objectives
+    2. 3-5 logical lessons that cover the module content comprehensively and align with the course goals
     
     For each lesson provide:
     - A clear title
-    - A specific learning objective
+    - A specific learning objective that contributes to the module's purpose within the course
     
     Format the response as a JSON object with the following structure:
     {{
