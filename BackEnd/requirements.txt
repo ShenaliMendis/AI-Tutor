@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+python-dotenv
+google-generativeai
+uuid
+httpx
+python-multipart
+jinja2
