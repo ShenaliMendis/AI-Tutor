@@ -1,10 +1,21 @@
 // API Endpoints
 const API_BASE = '/api/v1';
+const API_V2_BASE = '/api/v2';
 const API_ENDPOINTS = {
     planCourse: `${API_BASE}/plan-course`,
     planModule: `${API_BASE}/plan-module`,
     createLessonContent: `${API_BASE}/create-lesson-content`,
     createQuiz: `${API_BASE}/create-quiz`
+};
+
+const API_V2_ENDPOINTS = {
+    planCourse: `${API_V2_BASE}/plan-course`,
+    planModule: `${API_V2_BASE}/plan-module`,
+    createLessonContent: `${API_V2_BASE}/create-lesson-content`,
+    createQuiz: `${API_V2_BASE}/create-quiz`,
+    health: `${API_V2_BASE}/health`,
+    feedback: `${API_V2_BASE}/feedback`,
+    exportCourse: (courseId) => `${API_V2_BASE}/export-course/${courseId}`
 };
 
 // Store for course data
@@ -14,7 +25,8 @@ const appState = {
     lessonData: null,
     quizData: null,
     selectedModuleId: null,
-    selectedLessonId: null
+    selectedLessonId: null,
+    apiVersion: 'v1'  // Default to v1 API
 };
 
 // DOM elements

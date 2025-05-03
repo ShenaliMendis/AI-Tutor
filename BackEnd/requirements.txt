@@ -8,3 +8,4 @@ uuid
 httpx
 python-multipart
 jinja2
+tenacity
