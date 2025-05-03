@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import List
 
 class ModuleRequest(BaseModel):
+    course_title: str
+    course_description: str
     module_title: str
     module_summary: str
 

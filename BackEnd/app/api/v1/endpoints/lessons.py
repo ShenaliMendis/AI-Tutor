@@ -11,15 +11,20 @@ async def create_lesson_content(request: LessonRequest):
     prompt = f"""
     Create a detailed lesson based on the following information:
     
+    COURSE TITLE: {request.course_title}
+    MODULE TITLE: {request.module_title}
     LESSON TITLE: {request.lesson_title}
     LESSON OBJECTIVE: {request.lesson_objective}
     
-    Generate comprehensive lesson content (800-1200 words) that thoroughly covers the topic. 
+    Generate comprehensive lesson content (800-1200 words) that thoroughly covers the topic.
+    Make sure the content aligns with the overall course objectives and fits within the module context.
+    
     The lesson content should include:
     - Clear explanations of concepts
     - Examples when appropriate
     - Practical applications when possible
     - Key takeaways or summary points
+    - Connections to other lessons in the module where relevant
     """
     
     try:
@@ -45,12 +50,15 @@ async def create_quiz(request: LessonRequest):
     prompt = f"""
     Create a quiz based on the following lesson information:
     
+    COURSE TITLE: {request.course_title}
+    MODULE TITLE: {request.module_title}
     LESSON TITLE: {request.lesson_title}
     LESSON OBJECTIVE: {request.lesson_objective}
     
-    Generate a quiz with 3-5 questions to test understanding. 
+    Generate a quiz with 3-5 questions to test understanding of this lesson within the context of the module.
+    
     For each quiz question provide:
-    - A clear question
+    - A clear question related to the lesson content
     - 4 possible answer options (A, B, C, D)
     - The correct answer
     - A brief explanation of why the answer is correct
