@@ -19,8 +19,7 @@ class LoginPage extends StatelessWidget {
           backgroundColor: Colors.white,
           body: Center(
             child: SingleChildScrollView(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   maxWidth: 450, // Max width for large screens
