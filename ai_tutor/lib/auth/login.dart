@@ -83,7 +83,7 @@ class LoginPage extends StatelessWidget {
                       child: const TextField(
                         obscureText: true,
                         decoration: InputDecoration(
-                          hintText: "************",
+                          hintText: "",
                           border: InputBorder.none,
                           suffixIcon: Icon(Icons.visibility_off),
                         ),
@@ -161,7 +161,7 @@ class LoginPage extends StatelessWidget {
                               text: "Sign Up",
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: const Color.fromARGB(255, 95, 78, 78),
                               ),
                             ),
                           ],
