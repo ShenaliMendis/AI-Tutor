@@ -1,8 +1,9 @@
 import json
+import os
 from typing import Any, Dict
-import google.generativeai as genai
 from fastapi import HTTPException
 from app.config import get_settings
+from app.services.mcp_service import LangChainAgent # mcp server adapter
 
 class AIService:
     def __init__(self):
@@ -10,15 +11,14 @@ class AIService:
         if not settings.google_api_key:
             raise ValueError("GOOGLE_API_KEY environment variable not set")
         
-        # Initialize the model
-        genai.configure(api_key=settings.google_api_key)
-        self.model = genai.GenerativeModel(settings.model_name)
+        # Initialize the LangChain agent
+        self.lang_chain_agent = LangChainAgent()
     
     async def generate_content(self, prompt: str) -> str:
         """Generate content using the AI model"""
         try:
-            response = self.model.generate_content(prompt)
-            return response.text
+            response = await self.lang_chain_agent.get_response(prompt)
+            return response
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error generating content: {str(e)}")
     

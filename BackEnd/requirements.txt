@@ -9,3 +9,9 @@ httpx
 python-multipart
 jinja2
 tenacity
+# =====================
+flask
+langchain-google-genai
+langchain-mcp-adapters
+langgraph
+flask-session

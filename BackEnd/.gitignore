@@ -10,5 +10,7 @@ wheels/
 .venv
 
 # developer
-
+app/mcp_servers/mcp.json
 others/
+.vscode/
+.roo/

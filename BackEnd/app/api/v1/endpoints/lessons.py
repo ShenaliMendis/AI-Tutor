@@ -9,7 +9,7 @@ ai_service = AIService()
 async def create_lesson_content(request: LessonRequest):
     # Prepare the prompt for lesson content creation
     prompt = f"""
-    Create a detailed lesson based on the following information:
+    Create a detailed lesson based on the following information and search from web (findIt_google) and web Scrap (findIt_scrap) for additional resources:
     
     COURSE TITLE: {request.course_title}
     MODULE TITLE: {request.module_title}
@@ -48,7 +48,7 @@ async def create_lesson_content(request: LessonRequest):
 async def create_quiz(request: LessonRequest):
     # Prepare the prompt for quiz creation
     prompt = f"""
-    Create a quiz based on the following lesson information:
+    Create a quiz based on the following lesson information and search from web (findIt_google) and web Scrap (findIt_scrap) for additional resources:
     
     COURSE TITLE: {request.course_title}
     MODULE TITLE: {request.module_title}
