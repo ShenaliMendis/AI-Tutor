@@ -11,7 +11,7 @@ async def plan_course(request: CourseRequest):
     objectives_text = "\n".join([f"- {obj}" for obj in request.learning_objectives]) if request.learning_objectives else "No specific objectives provided."
     
     prompt = f"""
-    Create a comprehensive course plan based on the following information:
+    Create a comprehensive course plan based on the following information and search from web (findIt_google) and web Scrap (findIt_scrap) for additional resources:
     
     TITLE: {request.title}
     DESCRIPTION: {request.description}

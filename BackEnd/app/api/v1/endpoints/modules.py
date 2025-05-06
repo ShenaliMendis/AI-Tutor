@@ -10,7 +10,7 @@ ai_service = AIService()
 async def plan_module(request: ModuleRequest):
     # Prepare the prompt for module planning
     prompt = f"""
-    Create a detailed module plan based on the following information:
+    Create a detailed module plan based on the following information and search from web (findIt_google) and web Scrap (findIt_scrap) for additional resources:
     
     COURSE TITLE: {request.course_title}
     COURSE DESCRIPTION: {request.course_description}
