@@ -306,7 +306,7 @@ class StarsPainter extends CustomPainter {
     
     // Draw the stars and lines
     for (int i = 0; i < 8; i++) {
-      final double angle = i * 2 * 3.14159 / 8;
+      final double angle = i * 2 * math.pi / 8;
       
       // Calculate star position
       final double starX = center.dx + outerRadius * cos(angle);
