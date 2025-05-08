@@ -60,7 +60,8 @@ class ForgotPasswordScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF2F2F2),
                   borderRadius: BorderRadius.circular(10),
@@ -73,7 +74,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 250), // To enable scroll on smaller devices
+              const SizedBox(
+                  height: 250), // To enable scroll on smaller devices
               Container(
                 width: double.infinity,
                 height: 55,
