@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ai_tutor/quiz/result.dart';
 import 'dart:convert';
 
 void main() {
@@ -433,27 +434,35 @@ class _HexaEliteTutorPageState extends State<HexaEliteTutorPage> {
           color: Colors.grey[600],
           borderRadius: BorderRadius.circular(22),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              'Submit Answers',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 6),
-            Icon(
-              Icons.arrow_forward,
+    child: GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CongratulationsScreen()),
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'Submit Answers',
+            style: TextStyle(
               color: Colors.white,
-              size: 18,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
-          ],
-        ),
+          ),
+          SizedBox(width: 6),
+          Icon(
+            Icons.arrow_forward,
+            color: Colors.white,
+            size: 18,
+          ),
+        ],
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildBottomNavigation() {
